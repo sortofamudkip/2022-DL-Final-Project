@@ -5,6 +5,8 @@ Ideally it should mimic the file structure, as described in [page 6 of these sli
 
 Also obviously this is a private repo, the submitted files will just the final version of this repo.
 
+The Colab demo file (unfortunately managed by Jake) can be found [here](https://docs.google.com/document/d/1BD8EmhoiHegGZ0VttSsGSjRnBaHkJEk3UOHgU1ACWv0/edit#).
+
 ## Required setup
 ### Setup Anaconda env
 
