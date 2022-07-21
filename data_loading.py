@@ -12,9 +12,11 @@ from torchvision import transforms
 class HistopathologicCancerDetectionDataset(Dataset):
     KAGGLE_DATASET = "histopathologic-cancer-detection"
 
-    def __init__(self, data_path):
+    def __init__(self, data_path, download=False, download_path='/tmp'):
         self.data_path = data_path
-        self._download()
+        self.download_path = download_path
+        if download:
+            self._download()
         self.train_labels = pd.read_csv(
             os.path.join(self.data_path, "train_labels.csv")
         )
@@ -32,12 +34,12 @@ class HistopathologicCancerDetectionDataset(Dataset):
     def _download(self):
         kaggle.api.authenticate()
         kaggle.api.competition_download_files(
-            self.KAGGLE_DATASET, path=self.data_path, quiet=False
+            self.KAGGLE_DATASET, path=self.download_path, quiet=False
         )
         # Only unzip if we cannot find certain files
-        if not set(["train", "train_labels.csv"]).issubset(os.listdir(self.data_path)):
+        if not set(["train", "train_labels.csv"]).issubset(os.listdir(self.download_path)):
             with zipfile.ZipFile(
-                os.path.join(self.data_path, self.KAGGLE_DATASET + ".zip")
+                os.path.join(self.download_path, self.KAGGLE_DATASET + ".zip")
             ) as zipped:
                 zipped.extractall(self.data_path)
 
