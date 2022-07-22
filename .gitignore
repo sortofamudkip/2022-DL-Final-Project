@@ -155,6 +155,9 @@ cython_debug/
 
 # local storage (dataset etc)
 data
+jake/*
 
 # Kaggle files, such as API key
 .kaggle/*
+
+.DS_Store
