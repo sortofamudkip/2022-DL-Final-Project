@@ -152,4 +152,9 @@ cython_debug/
 #.idea/
 
 .vscode
+
+# local storage (dataset etc)
 data
+
+# Kaggle files, such as API key
+.kaggle/*
