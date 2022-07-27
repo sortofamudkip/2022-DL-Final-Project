@@ -10,7 +10,11 @@ Also obviously this is a private repo, the submitted files will just the final v
 * The docs file can be found [here](https://docs.google.com/document/d/1BD8EmhoiHegGZ0VttSsGSjRnBaHkJEk3UOHgU1ACWv0/edit#).
 
 ## Required setup
-### Setup Anaconda env
+### Python Setup
+You can setup your desired python env using conda, virtualenv etc. Make sure to get all the dependencies from `requirements.txt`
+
+`pip install -r requirements.txt`
+
 ### Setup Kaggle for data loading
 In order to download the dataset, you need access to Kaggle. Please follow these steps:
 1. Create account on [Kaggle](https://www.kaggle.com/)
@@ -18,10 +22,15 @@ In order to download the dataset, you need access to Kaggle. Please follow these
 2. Click "Create New API Token", which downloads a token file
 4. Move downloaded token file to ~/.kaggle/kaggle.json`
 
-If you now call the function `load_data` in `data_loading.py`, we download the dataset the `data` path in this repo. You can run this function as often as you want without redownloading the data.
-### Setup Wandb
-For the training phase, we recommend to use wandb. For this, please create an account as described [here](https://docs.wandb.ai/quickstart). When training a model, please specify tags in order to help us organize the results.
+If you now call the function `load_data` in `data_loading.py`, we download the dataset the `data` path in this repo. When training or testing for the first time, you can download the data. We will explain this in a later section. 
 
-## Using the models
-### Training the models
+### Setup Wandb
+For the training phase, we recommend logging to wandb. For this, please create an account as described [here](https://docs.wandb.ai/quickstart). When training a model, please specify tags in the CLI args in order to help us organize the results.
+
+## Using this tool
+### Train a model
 Use the `train.py`. Run `python train.py -h` to see the required arguments.
+
+### Test a model 
+
+### Colab Demo

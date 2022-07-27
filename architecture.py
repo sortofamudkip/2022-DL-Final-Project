@@ -40,6 +40,7 @@ def resnet_pretrained():
 
 
 def vgg16_pretrained():
+    # TODO: Need to transform the data
     model_vgg16 = models.vgg16(pretrained=True)  # choosing the model
     num_features = model_vgg16.classifier[6].in_features
     features = list(model_vgg16.classifier.children())[:-1]  # Remove last layer
@@ -48,6 +49,7 @@ def vgg16_pretrained():
     return model_vgg16
 
 
+# TODO: Add image transforms here and export
 models = {
     "jake_demo": JakeDemoNet,
     "resnet_pretrained": resnet_pretrained,
