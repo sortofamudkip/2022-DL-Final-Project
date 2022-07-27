@@ -38,11 +38,12 @@ class HistopathologicCancerDetectionDataset(Dataset):
         kaggle.api.competition_download_files(
             self.KAGGLE_DATASET, path=self.download_path, quiet=False
         )
-        # TODO: Only get train and labels files, more transfors
         with zipfile.ZipFile(
             os.path.join(self.download_path, self.KAGGLE_DATASET + ".zip")
         ) as zipped:
-            for member in filter(lambda name: name.startswith(self.RELEVANT_FILES), zipped.namelist()):
+            for member in filter(
+                lambda name: name.startswith(self.RELEVANT_FILES), zipped.namelist()
+            ):
                 zipped.extract(member, self.data_path)
 
 

@@ -10,6 +10,7 @@ import wandb
 from torch.optim import lr_scheduler
 from utils import WANDB_PROJECT_NAME, get_device
 
+# TODO: Validation?, take X % as validation
 
 def train(model, criterion, optimizer, scheduler, train_loader, device, num_epochs=25):
     wandb.watch(model, log_freq=100)
@@ -18,8 +19,10 @@ def train(model, criterion, optimizer, scheduler, train_loader, device, num_epoc
     model.train()
     for epoch in range(num_epochs):
         for batch in train_loader:
-            input_images = batch[0].to(device)
-            input_labels = (batch[1]).type(torch.LongTensor).to(device)
+            input_images, input_labels = batch
+
+            input_images.to(device)
+            input_labels.type(torch.LongTensor).to(device)
 
             optimizer.zero_grad()
 
@@ -40,11 +43,19 @@ def train(model, criterion, optimizer, scheduler, train_loader, device, num_epoc
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train a model with given parameters and save its to some path')
+    parser = argparse.ArgumentParser(
+        description="Train a model with given parameters and save its to some path"
+    )
     parser.add_argument(
         "--data_path",
         default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "data"),
-        help="Path to the stored raw data. Downloads the data if it cannot be found.",
+        help="Path to the stored raw data.",
+    )
+    parser.add_argument(
+        "--download_data",
+        type=bool,
+        default=False,
+        help="Force downloading the data into the data_path",
     )
     parser.add_argument(
         "--batch_size", type=int, default=32, help="Training batch size"
@@ -54,7 +65,7 @@ def main():
         "--learning_rate", type=float, default=0.01, help="Learning rate"
     )
     parser.add_argument(
-        "--tags", nargs='+', help="List of tags to find your results in Wandb"
+        "--tags", nargs="+", help="List of tags to find your results in Wandb"
     )
     parser.add_argument(
         "--output_path",
@@ -68,19 +79,18 @@ def main():
     )
     args = parser.parse_args()
 
-    # Setup Wandb with the arguments from ArgumentParser 
-    wandb.init(
-        project=WANDB_PROJECT_NAME,
-        tags=args.tags
-    )
-    wandb.config.update({'phase': 'train'})
+    # Setup Wandb with the arguments from ArgumentParser
+    wandb.init(project=WANDB_PROJECT_NAME, tags=args.tags)
+    wandb.config.update({"phase": "train"})
     wandb.config.update(args)
 
     # Setup all the things required for training
     criterion = nn.CrossEntropyLoss()
     device = get_device()
-    train_loader, _ = load_data(args.data_path, batch_size=args.batch_size)
-    model = architecture.models[args.model]() # Lazily setup the model
+    train_loader, _ = load_data(
+        args.data_path, download=args.download_data, batch_size=args.batch_size
+    )
+    model = architecture.models[args.model]()  # Lazily setup the model
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
@@ -94,6 +104,7 @@ def main():
     )
 
     torch.save(model, args.output_path)
+
 
 if __name__ == "__main__":
     main()
