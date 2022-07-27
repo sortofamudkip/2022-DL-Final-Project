@@ -11,7 +11,6 @@ Also obviously this is a private repo, the submitted files will just the final v
 
 ## Required setup
 ### Setup Anaconda env
-
 ### Setup Kaggle for data loading
 In order to download the dataset, you need access to Kaggle. Please follow these steps:
 1. Create account on [Kaggle](https://www.kaggle.com/)
@@ -20,3 +19,9 @@ In order to download the dataset, you need access to Kaggle. Please follow these
 4. Move downloaded token file to ~/.kaggle/kaggle.json`
 
 If you now call the function `load_data` in `data_loading.py`, we download the dataset the `data` path in this repo. You can run this function as often as you want without redownloading the data.
+### Setup Wandb
+For the training phase, we recommend to use wandb. For this, please create an account as described [here](https://docs.wandb.ai/quickstart). When training a model, please specify tags in order to help us organize the results.
+
+## Using the models
+### Training the models
+Use the `train.py`. Run `python train.py -h` to see the required arguments.
