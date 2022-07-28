@@ -22,7 +22,7 @@ class HistopathologicCancerDetectionDataset(Dataset):
         self.train_labels = pd.read_csv(
             os.path.join(self.data_path, "train_labels.csv")
         )
-        self.transforms = tv_transforms.Compose(transforms + [tv_transforms.ToTensor()])
+        self.transforms = tv_transforms.Compose(transforms)
 
     def __len__(self):
         return len(self.train_labels)
@@ -47,10 +47,13 @@ class HistopathologicCancerDetectionDataset(Dataset):
                 zipped.extract(member, self.data_path)
 
 
-def load_data(data_path=None, download=False, test_split=0.33, batch_size=32):
+def load_data(
+    data_path=None, download=False, transforms=[], test_split=0.33, batch_size=32
+):
     """
     Downloads the dataset from Kaggle if needed, creates a Pytorch Dataset and then
-    setups data loaders for the training and test set.
+    setups data loaders for the training and test set. You can specify torchvision
+    transforms to prepare images for the model.
 
     Required setup:
     1. Go to https://www.kaggle.com/<ACCOUNT_NAME>/account
@@ -59,10 +62,14 @@ def load_data(data_path=None, download=False, test_split=0.33, batch_size=32):
     """
     if not data_path:
         data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
-    dataset = HistopathologicCancerDetectionDataset(data_path, download=download)
+    dataset = HistopathologicCancerDetectionDataset(
+        data_path, download=download, transforms=transforms
+    )
     test_size = int(len(dataset) * test_split)
     train_size = len(dataset) - test_size
     train_set, test_set = random_split(dataset, [train_size, test_size])
-    train_loader = DataLoader(train_set, shuffle=True, batch_size=batch_size)
-    test_loader = DataLoader(test_set, batch_size=batch_size)
+    train_loader = DataLoader(
+        train_set, shuffle=True, batch_size=batch_size, num_workers=4
+    )
+    test_loader = DataLoader(test_set, batch_size=batch_size, num_workers=4)
     return train_loader, test_loader

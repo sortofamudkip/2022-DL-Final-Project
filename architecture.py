@@ -3,6 +3,7 @@ import torch.optim as optim
 import torch.nn as F
 import torch, torchvision
 from torchvision import datasets, models, transforms
+import torchvision.transforms as transforms
 
 
 class JakeDemoNet(nn.Module):
@@ -49,9 +50,17 @@ def vgg16_pretrained():
     return model_vgg16
 
 
-# TODO: Add image transforms here and export
+# A model consists of image transformation suitable to the model + the actual model itself
+# Returning the type and not the instance makes parameterization a bit easier.
+# From the outside you can then call: models['resnet_pretrained']()
 models = {
-    "jake_demo": JakeDemoNet,
-    "resnet_pretrained": resnet_pretrained,
-    "vgg16_pretrained": vgg16_pretrained,
+    "jake_demo": ([transforms.ToTensor()], JakeDemoNet),
+    "resnet_pretrained": (
+        [transforms.Resize(224), transforms.ToTensor()],
+        resnet_pretrained,
+    ),
+    "vgg16_pretrained": (
+        [transforms.Resize(224), transforms.ToTensor()],
+        vgg16_pretrained,
+    ),
 }

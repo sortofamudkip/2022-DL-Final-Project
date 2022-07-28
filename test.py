@@ -12,49 +12,48 @@ import torch.optim as optim
 import wandb
 from torch.optim import lr_scheduler
 from utils import WANDB_PROJECT_NAME, get_device
-from sklearn.metrics import confusion_matrix
+import sklearn.metrics
 
+# Classify random imagee
+# Call Imbalanc
 # TODO: New scores such F1, AUC, Recall etc
-def evaluate_model(model, val_loader):
-    """
-    Method to check the model preformance per different classification metrics
-    """
-    was_training = model.training
-    model.eval()
-    y_pred = []
-    y_true = []
-    CM=0
-    with torch.no_grad():
-        for i, s in enumerate(val_loader):
-            inputs = s[0].to(device)
-            
-            #casting labels to long as float doesn't work to train the resnet
-            labels = (s[1]).type(torch.LongTensor)
-            outputs = model(inputs)
-            _, preds = torch.max(outputs, 1)
-            y_pred.extend(preds.data.cpu().numpy())
-            y_true.extend(labels.data.cpu().numpy())
-    cf_matrix = confusion_matrix(y_true, y_pred)   
-    
-    return cf_matrix
+
 
 def test(model, test_loader, device):
     wandb.watch(model, log_freq=100)
 
     with torch.no_grad():
-        for batch in test_loader:
-            input_images, ouput_labels = batch
+        for input_images, output_labels in test_loader:
 
             input_images.to(device)
-            ouput_labels.type(torch.LongTensor).to(device)
+            output_labels.type(torch.LongTensor).to(device)
 
             predicted_outputs = model(input_images)
 
             _, predicted = torch.max(predicted_outputs, 1)
-            total += ouput_labels.size(0)
-            running_accuracy += (predicted == ouput_labels).sum().item()
+            total += output_labels.size(0)
+            running_accuracy += (predicted == output_labels).sum().item()
 
-            wandb.log({"accuracy": running_accuracy})
+            f1 = sklearn.metrics.f1_score(output_labels, predicted)
+            recall = sklearn.metrics.recall_score(output_labels, predicted)
+            precision = sklearn.metrics.precision_score(output_labels, predicted)
+            auc = sklearn.metrics.roc_auc_score(output_labels, predicted)
+
+            wandb.log(
+                {
+                    "accuracy": running_accuracy,
+                    "f1": f1,
+                    "recall": recall,
+                    "precision": precision,
+                    "auc": auc,
+                    "conf_mat": wandb.plot.confusion_matrix(
+                        probs=None,
+                        y_true=output_labels,
+                        preds=predicted,
+                        class_names=[0, 1],
+                    ),
+                }
+            )
 
 
 def main():
@@ -96,3 +95,7 @@ def main():
     model.eval()
 
     test(model, test_loader)
+
+
+if __name__ == "__main__":
+    main()

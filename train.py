@@ -11,24 +11,25 @@ from torch.optim import lr_scheduler
 from utils import WANDB_PROJECT_NAME, get_device
 
 # TODO: Validation?, take X % as validation
+# TODO: Checkpointing
+
 
 def train(model, criterion, optimizer, scheduler, train_loader, device, num_epochs=25):
     wandb.watch(model, log_freq=100)
 
     running_loss = 0.0
     model.train()
-    for epoch in range(num_epochs):
-        for batch in train_loader:
-            input_images, input_labels = batch
 
+    for epoch in range(num_epochs):
+        for input_images, output_labels in train_loader:
             input_images.to(device)
-            input_labels.type(torch.LongTensor).to(device)
+            output_labels.type(torch.LongTensor).to(device)
 
             optimizer.zero_grad()
 
             with torch.set_grad_enabled(True):
                 outputs = model(input_images)
-                loss = criterion(outputs, input_labels)
+                loss = criterion(outputs, output_labels)
                 loss.backward()
                 optimizer.step()
 
@@ -87,10 +88,15 @@ def main():
     # Setup all the things required for training
     criterion = nn.CrossEntropyLoss()
     device = get_device()
+    # Lazily setup the model
+    input_transforms, model = architecture.models[args.model]()
+    # Load the training data and apply image transformation and the badge size
     train_loader, _ = load_data(
-        args.data_path, download=args.download_data, batch_size=args.batch_size
+        args.data_path,
+        transforms=input_transforms,
+        download=args.download_data,
+        batch_size=args.batch_size,
     )
-    model = architecture.models[args.model]()  # Lazily setup the model
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
