@@ -152,5 +152,13 @@ cython_debug/
 #.idea/
 
 .vscode
-data
 wandb
+
+# local storage (dataset etc)
+data
+jake/*
+
+# Kaggle files, such as API key
+.kaggle/*
+
+.DS_Store

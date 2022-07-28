@@ -8,6 +8,7 @@ Also obviously this is a private repo, the submitted files will just the final v
 ## Links
 * The Colab demo file (unfortunately managed by Jake) can be found [here](https://colab.research.google.com/drive/1S5pJnkNnFQOg1wkDW5q-kJhHEHNOMR9C?usp=sharing).
 * The docs file can be found [here](https://docs.google.com/document/d/1BD8EmhoiHegGZ0VttSsGSjRnBaHkJEk3UOHgU1ACWv0/edit#).
+* Notion site can be found [here](https://brook-emery-b8d.notion.site/DL-Project-Histopathologic-Cancer-Detection-5bf981a7614141de9c55be811333a1d2).
 
 ## Required setup
 ### Python Setup
