@@ -87,10 +87,11 @@ def main():
     wandb.config.update(args)
 
     device = get_device()
+    input_transforms, model_klass = architecture.models[args.model]
+    model = model_klass()
     _, test_loader = load_data(
-        args.data_path, download=args.download_data, batch_size=args.batch_size
+        args.data_path, transforms=input_transforms, download=args.download_data, batch_size=args.batch_size
     )
-    model = architecture.models[args.model]()
     model.load(torch.load(args.model_path))
     model.eval()
 

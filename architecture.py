@@ -1,6 +1,6 @@
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn as F
+import torch.nn.functional as F
 import torch, torchvision
 from torchvision import datasets, models, transforms
 import torchvision.transforms as transforms
@@ -22,12 +22,12 @@ class JakeDemoNet(nn.Module):
 
     def forward(self, x):
         # Max pooling over a (2, 2) window
-        x = F.MaxPool2d(F.ReLU(self.conv1(x)), (2, 2))
+        x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
         # If the size is a square, you can specify with a single number
-        x = F.MaxPool2d(F.ReLU(self.conv2(x)), 2)
+        x = F.max_pool2d(F.relu(self.conv2(x)), 2)
         x = torch.flatten(x, 1)  # flatten all dimensions except the batch dimension
-        x = F.ReLU(self.fc1(x))
-        x = F.ReLU(self.fc2(x))
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
         x = self.fc3(x)
         x = self.softmax(x)
         return x

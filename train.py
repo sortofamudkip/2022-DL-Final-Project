@@ -89,7 +89,8 @@ def main():
     criterion = nn.CrossEntropyLoss()
     device = get_device()
     # Lazily setup the model
-    input_transforms, model = architecture.models[args.model]()
+    input_transforms, model_klass = architecture.models[args.model]
+    model = model_klass()
     # Load the training data and apply image transformation and the badge size
     train_loader, _ = load_data(
         args.data_path,
