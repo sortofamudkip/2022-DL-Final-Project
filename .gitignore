@@ -152,6 +152,7 @@ cython_debug/
 #.idea/
 
 .vscode
+wandb
 
 # local storage (dataset etc)
 data
