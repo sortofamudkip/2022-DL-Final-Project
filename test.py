@@ -52,10 +52,10 @@ def test(model, test_loader, device):
     print("pred:", y_predicated)
 
 
-    f1 = sklearn.metrics.f1_score(output_labels, predicted)
-    recall = sklearn.metrics.recall_score(output_labels, predicted)
-    precision = sklearn.metrics.precision_score(output_labels, predicted)
-    auc = sklearn.metrics.roc_auc_score(output_labels, predicted)
+    f1 = sklearn.metrics.f1_score(y_true, y_predicated)
+    recall = sklearn.metrics.recall_score(y_true, y_predicated)
+    precision = sklearn.metrics.precision_score(y_true, y_predicated)
+    auc = sklearn.metrics.roc_auc_score(y_true, y_predicated)
 
 # OR to log a final metric at the end of training you can also use wandb.summary
 # >>>>> wandb.summary["accuracy"] = accuracy
