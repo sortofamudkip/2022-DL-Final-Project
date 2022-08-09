@@ -9,10 +9,19 @@ import torch.optim as optim
 import wandb
 from torch.optim import lr_scheduler
 from utils import WANDB_PROJECT_NAME, get_device
+import logging
 
 # TODO: Validation?, take X % as validation
 # TODO: Checkpointing
-
+# TODO: Data augmentation: Crop, rotation, better: maybe constrast, random noise, flip, gaussion filter, white noise
+# resnet as benchmark
+# Resnt from scratch
+# Unet
+# Add weights to class imbalance, batch oversampling, make sure that at least 1 sample is in data loaders
+# VGG
+# https://www.kaggle.com/competitions/histopathologic-cancer-detection/discussion/81747
+# https://blog.paperspace.com/unet-architecture-image-segmentation/
+# https://github.com/qubvel/ttach
 
 def train(model, criterion, optimizer, scheduler, train_loader, device, num_epochs=25):
     wandb.watch(model, log_freq=100)
@@ -50,7 +59,7 @@ def main():
     parser.add_argument(
         "--data_path",
         default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "data"),
-        help="Path to the stored raw data.",
+        help="Path to the stored raw data",
     )
     parser.add_argument(
         "--download_data",
@@ -69,7 +78,7 @@ def main():
         "--tags", nargs="+", help="List of tags to find your results in Wandb"
     )
     parser.add_argument(
-        "--output_path",
+        "--model_state_path",
         help="Default path for the training model including a name such as data/fancy_model.pt",
         required=True
     )
@@ -95,9 +104,11 @@ def main():
     # Setup all the things required for training
     criterion = nn.CrossEntropyLoss()
     device = get_device()
+
     # Lazily setup the model
     input_transforms, model_klass = architecture.models[args.model]
     model = model_klass()
+    
     # Load the training data and apply image transformation and the badge size
     train_loader, _ = load_data(
         args.data_path,
@@ -110,7 +121,7 @@ def main():
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
-    print(f"training model {args.model}...")
+    logging.info("Start training model", model=args.model)
 
     train(
         model=model,
@@ -121,9 +132,9 @@ def main():
         device=device,
         num_epochs=5
     )
-    print(f"saving model {args.model} to {args.output_path}...")
+    logging.info("Saving model", model=args.model, model_state_path=args.model_state_path)
 
-    torch.save(model, args.output_path)
+    torch.save(model.state_dict(), args.model_state_path)
 
 
 if __name__ == "__main__":

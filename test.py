@@ -1,6 +1,3 @@
-from pkg_resources import require
-
-
 import argparse
 from pickletools import optimize
 import architecture
@@ -13,51 +10,81 @@ import wandb
 from torch.optim import lr_scheduler
 from utils import WANDB_PROJECT_NAME, get_device
 import sklearn.metrics
+import numpy as np
 
 # Classify random imagee
 # Call Imbalanc
-# TODO: New scores such F1, AUC, Recall etc
-
+# TODO: divide by total
+# TODO: Use actual validation
+# TODO: Submit to kaggle
+# Proper test set
+# TODO: More images
+# Hyperparemer tuning
+# TODO: http://gradcam.cloudcv.org/
+# TODO: Posthoc Captum
+# TODO: Run model
 
 def test(model, test_loader, device):
     wandb.watch(model, log_freq=100)
 
-    with torch.no_grad():
-        for input_images, output_labels in test_loader:
+    test_size = len(test_loader.dataset)
+    batch_size = test_loader.batch_size
 
+    y_true = np.empty(test_size)
+    y_predicated = np.empty(test_size)
+    with torch.no_grad():
+        for i, (input_images, output_labels) in enumerate(test_loader):
             input_images.to(device)
             output_labels.type(torch.LongTensor).to(device)
-
+ 
             predicted_outputs = model(input_images)
-
             _, predicted = torch.max(predicted_outputs, 1)
-            total += output_labels.size(0)
-            running_accuracy += (predicted == output_labels).sum().item()
+            y_true[i*batch_size: (i+1)*batch_size] = output_labels
+            y_predicated[i*batch_size: (i+1)*batch_size] = predicted
+            print(i)
+            # _, predicted = torch.max(predicted_outputs, 1)
+            # running_accuracy += (predicted == output_labels).sum().item()
+            # wandb.log({
+            #         "accuracy": running_accuracy
+            #     })
+            
+    print("true:", y_true)
+    print("pred:", y_predicated)
 
-            f1 = sklearn.metrics.f1_score(output_labels, predicted)
-            recall = sklearn.metrics.recall_score(output_labels, predicted)
-            precision = sklearn.metrics.precision_score(output_labels, predicted)
-            auc = sklearn.metrics.roc_auc_score(output_labels, predicted)
 
-            wandb.log(
-                {
-                    "accuracy": running_accuracy,
-                    "f1": f1,
-                    "recall": recall,
-                    "precision": precision,
-                    "auc": auc,
-                    "conf_mat": wandb.plot.confusion_matrix(
-                        probs=None,
-                        y_true=output_labels,
-                        preds=predicted,
-                        class_names=[0, 1],
-                    ),
-                }
-            )
+    f1 = sklearn.metrics.f1_score(output_labels, predicted)
+    recall = sklearn.metrics.recall_score(output_labels, predicted)
+    precision = sklearn.metrics.precision_score(output_labels, predicted)
+    auc = sklearn.metrics.roc_auc_score(output_labels, predicted)
+
+# OR to log a final metric at the end of training you can also use wandb.summary
+# >>>>> wandb.summary["accuracy"] = accuracy
+
+    return
+
+    wandb.sklearn.plot_roc(y_test, y_probas, labels)
+
+# https://docs.wandb.ai/guides/integrations/scikit
+            # wandb.log(
+            #     {
+            #         "accuracy": running_accuracy,
+            #         "f1": f1,
+            #         "recall": recall,
+            #         "precision": precision,
+            #         "auc": auc,
+            #         "conf_mat": wandb.plot.confusion_matrix(
+            #             probs=None,
+            #             y_true=output_labels,
+            #             preds=predicted,
+            #             class_names=[0, 1],
+            #         ),
+            #     }
+            # )
+
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Test an import model")
+    parser = argparse.ArgumentParser(description="Test an imported model")
     parser.add_argument(
         "--data_path",
         default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "data"),
@@ -70,7 +97,7 @@ def main():
         help="Force downloading the data into the data_path",
     )
     parser.add_argument("--batch_size", type=int, default=32, help="Test batch size")
-    parser.add_argument("--model_path", require=True, help="Path to the trained model")
+    parser.add_argument("--model_state_path", required=True, help="Path to the trained model")
     parser.add_argument(
         "--tags", nargs="+", help="List of tags to find your results in Wandb"
     )
@@ -78,7 +105,7 @@ def main():
         "--model",
         choices=architecture.models.keys(),
         required=True,
-        help="Architecture to train. Check architecture.py",
+        help="Architecture to test. Check architecture.py",
     )
     args = parser.parse_args()
 
@@ -89,13 +116,14 @@ def main():
     device = get_device()
     input_transforms, model_klass = architecture.models[args.model]
     model = model_klass()
+    model.load_state_dict(torch.load(args.model_state_path))
     _, test_loader = load_data(
-        args.data_path, transforms=input_transforms, download=args.download_data, batch_size=args.batch_size
+        args.data_path, transforms=input_transforms, download=args.download_data, batch_size=args.batch_size, first_n_rows=500
     )
-    model.load(torch.load(args.model_path))
+
     model.eval()
 
-    test(model, test_loader)
+    test(model, test_loader, device=device)
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ from PIL import Image
 from yaml import load
 import torchvision.transforms as tv_transforms
 
+# TODO: Kaggle submissoion
 
 class HistopathologicCancerDetectionDataset(Dataset):
     KAGGLE_DATASET = "histopathologic-cancer-detection"
