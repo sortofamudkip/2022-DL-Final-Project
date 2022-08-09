@@ -71,12 +71,19 @@ def main():
     parser.add_argument(
         "--output_path",
         help="Default path for the training model including a name such as data/fancy_model.pt",
+        required=True
     )
     parser.add_argument(
         "--model",
         choices=architecture.models.keys(),
         required=True,
         help="Architecture to train. Check architecture.py",
+    )
+    parser.add_argument(
+        "--first_n_rows",
+        type=int,
+        default=0,
+        help="Only use the first N rows of the dataset (for debugging)",
     )
     args = parser.parse_args()
 
@@ -97,9 +104,13 @@ def main():
         transforms=input_transforms,
         download=args.download_data,
         batch_size=args.batch_size,
+        first_n_rows=args.first_n_rows
     )
+    # print("number of rows:", len(train_loader), args.first_n_rows); return
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+
+    print(f"training model {args.model}...")
 
     train(
         model=model,
@@ -108,7 +119,9 @@ def main():
         train_loader=train_loader,
         scheduler=scheduler,
         device=device,
+        num_epochs=5
     )
+    print(f"saving model {args.model} to {args.output_path}...")
 
     torch.save(model, args.output_path)
 
