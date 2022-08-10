@@ -72,7 +72,7 @@ def load_data(
     train_size = len(dataset) - test_size
     train_set, test_set = random_split(dataset, [train_size, test_size])
     train_loader = DataLoader(
-        train_set, shuffle=True, batch_size=batch_size, num_workers=4
+        train_set, shuffle=True, batch_size=batch_size, num_workers=1
     )
     test_loader = DataLoader(test_set, batch_size=batch_size, num_workers=4)
     return train_loader, test_loader

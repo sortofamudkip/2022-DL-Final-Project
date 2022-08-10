@@ -29,6 +29,7 @@ def test(model, test_loader, device):
 
     test_size = len(test_loader.dataset)
     batch_size = test_loader.batch_size
+    running_accuracy = 0
 
     y_true = np.empty(test_size)
     y_predicated = np.empty(test_size)
@@ -41,45 +42,42 @@ def test(model, test_loader, device):
             _, predicted = torch.max(predicted_outputs, 1)
             y_true[i*batch_size: (i+1)*batch_size] = output_labels
             y_predicated[i*batch_size: (i+1)*batch_size] = predicted
-            print(i)
-            # _, predicted = torch.max(predicted_outputs, 1)
-            # running_accuracy += (predicted == output_labels).sum().item()
-            # wandb.log({
-            #         "accuracy": running_accuracy
-            #     })
+
+            # there really isn't a point for this but let's try it anyway
+            running_accuracy += (predicted == output_labels).sum().item()
+            wandb.log({
+                    "accuracy": running_accuracy
+                })
             
-    print("true:", y_true)
-    print("pred:", y_predicated)
+    # print("true:", y_true)
+    # print("pred:", y_predicated)
 
 
     f1 = sklearn.metrics.f1_score(y_true, y_predicated)
     recall = sklearn.metrics.recall_score(y_true, y_predicated)
     precision = sklearn.metrics.precision_score(y_true, y_predicated)
     auc = sklearn.metrics.roc_auc_score(y_true, y_predicated)
+    accuracy = sklearn.metrics.accuracy_score(y_true, y_predicated)
 
 # OR to log a final metric at the end of training you can also use wandb.summary
-# >>>>> wandb.summary["accuracy"] = accuracy
-
-    return
-
-    wandb.sklearn.plot_roc(y_test, y_probas, labels)
+    # wandb.sklearn.plot_roc(y_test, y_probas, labels)
 
 # https://docs.wandb.ai/guides/integrations/scikit
-            # wandb.log(
-            #     {
-            #         "accuracy": running_accuracy,
-            #         "f1": f1,
-            #         "recall": recall,
-            #         "precision": precision,
-            #         "auc": auc,
-            #         "conf_mat": wandb.plot.confusion_matrix(
-            #             probs=None,
-            #             y_true=output_labels,
-            #             preds=predicted,
-            #             class_names=[0, 1],
-            #         ),
-            #     }
-            # )
+    wandb.log(
+        {
+            "accuracy": accuracy,
+            "f1": f1,
+            "recall": recall,
+            "precision": precision,
+            "auc": auc,
+            "conf_mat": wandb.plot.confusion_matrix(
+                probs=None,
+                y_true=y_true,
+                preds=y_predicated,
+                class_names=[0, 1],
+            ),
+        }
+    )
 
 
 
@@ -107,6 +105,12 @@ def main():
         required=True,
         help="Architecture to test. Check architecture.py",
     )
+    parser.add_argument(
+        "--first_n_rows",
+        type=int,
+        default=0,
+        help="Only use the first N rows of the dataset (for debugging)",
+    )
     args = parser.parse_args()
 
     wandb.init(project=WANDB_PROJECT_NAME, tags=args.tags)
@@ -118,7 +122,7 @@ def main():
     model = model_klass()
     model.load_state_dict(torch.load(args.model_state_path))
     _, test_loader = load_data(
-        args.data_path, transforms=input_transforms, download=args.download_data, batch_size=args.batch_size, first_n_rows=500
+        args.data_path, transforms=input_transforms, download=args.download_data, batch_size=args.batch_size, first_n_rows=args.first_n_rows
     )
 
     model.eval()
