@@ -12,16 +12,8 @@ from utils import WANDB_PROJECT_NAME, get_device, DEFAULT_DATA_PATH, timestamp
 import logging
 
 # TODO: Validation?, take X % as validation
-# TODO: Checkpointing
-# TODO: Data augmentation: Crop, rotation, better: maybe constrast, random noise, flip, gaussion filter, white noise
-# resnet as benchmark
-# Resnt from scratch
 # Unet
 # Add weights to class imbalance, batch oversampling, make sure that at least 1 sample is in data loaders
-# VGG
-# https://www.kaggle.com/competitions/histopathologic-cancer-detection/discussion/81747
-# https://blog.paperspace.com/unet-architecture-image-segmentation/
-# https://github.com/qubvel/ttach
 
 
 def train(

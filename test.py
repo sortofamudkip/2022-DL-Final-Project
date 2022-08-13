@@ -12,12 +12,9 @@ from utils import WANDB_PROJECT_NAME, get_device, DEFAULT_DATA_PATH
 import sklearn.metrics
 import numpy as np
 
-# Classify random imagee
-# Call Imbalanc
 # TODO: divide by total
 # TODO: Use actual validation
 # TODO: Submit to kaggle
-# TODO: More images
 # TODO: http://gradcam.cloudcv.org/
 # TODO: Posthoc Captum
 
