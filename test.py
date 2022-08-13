@@ -8,7 +8,7 @@ import torch.nn as nn
 import torch.optim as optim
 import wandb
 from torch.optim import lr_scheduler
-from utils import WANDB_PROJECT_NAME, get_device
+from utils import WANDB_PROJECT_NAME, get_device, DEFAULT_DATA_PATH
 import sklearn.metrics
 import numpy as np
 
@@ -17,12 +17,10 @@ import numpy as np
 # TODO: divide by total
 # TODO: Use actual validation
 # TODO: Submit to kaggle
-# Proper test set
 # TODO: More images
-# Hyperparemer tuning
 # TODO: http://gradcam.cloudcv.org/
 # TODO: Posthoc Captum
-# TODO: Run model
+
 
 def test(model, test_loader, device):
     wandb.watch(model, log_freq=100)
@@ -37,21 +35,15 @@ def test(model, test_loader, device):
         for i, (input_images, output_labels) in enumerate(test_loader):
             input_images.to(device)
             output_labels.type(torch.LongTensor).to(device)
- 
+
             predicted_outputs = model(input_images)
             _, predicted = torch.max(predicted_outputs, 1)
-            y_true[i*batch_size: (i+1)*batch_size] = output_labels
-            y_predicated[i*batch_size: (i+1)*batch_size] = predicted
+            y_true[i * batch_size : (i + 1) * batch_size] = output_labels
+            y_predicated[i * batch_size : (i + 1) * batch_size] = predicted
 
             # there really isn't a point for this but let's try it anyway
             running_accuracy += (predicted == output_labels).sum().item()
-            wandb.log({
-                    "accuracy": running_accuracy
-                })
-            
-    # print("true:", y_true)
-    # print("pred:", y_predicated)
-
+            wandb.log({"accuracy": running_accuracy})
 
     f1 = sklearn.metrics.f1_score(y_true, y_predicated)
     recall = sklearn.metrics.recall_score(y_true, y_predicated)
@@ -59,33 +51,29 @@ def test(model, test_loader, device):
     auc = sklearn.metrics.roc_auc_score(y_true, y_predicated)
     accuracy = sklearn.metrics.accuracy_score(y_true, y_predicated)
 
-# OR to log a final metric at the end of training you can also use wandb.summary
-    # wandb.sklearn.plot_roc(y_test, y_probas, labels)
+    # OR to log a final metric at the end of training you can also use wandb.summary
 
-# https://docs.wandb.ai/guides/integrations/scikit
+    # https://docs.wandb.ai/guides/integrations/scikit
+    wandb.run.summary["accuracy"] = accuracy
+    wandb.run.summary["f1"] = f1
+    wandb.run.summary["recall"] = recall
+    wandb.run.summary["precision"] = precision
+    wandb.run.summary["auc"] = auc
+    wandb.sklearn.plot_roc(y_true, y_predicated, [0, 1])
     wandb.log(
         {
-            "accuracy": accuracy,
-            "f1": f1,
-            "recall": recall,
-            "precision": precision,
-            "auc": auc,
-            "conf_mat": wandb.plot.confusion_matrix(
-                probs=None,
-                y_true=y_true,
-                preds=y_predicated,
-                class_names=[0, 1],
-            ),
+            "conf_matrix": wandb.plot.confusion_matrix(
+                probs=None, y_true=y_true, preds=y_predicated, class_names=[0, 1],
+            )
         }
     )
-
 
 
 def main():
     parser = argparse.ArgumentParser(description="Test an imported model")
     parser.add_argument(
         "--data_path",
-        default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "data"),
+        default=DEFAULT_DATA_PATH,
         help="Path to the stored raw data. Downloads the data if it cannot be found.",
     )
     parser.add_argument(
@@ -95,7 +83,9 @@ def main():
         help="Force downloading the data into the data_path",
     )
     parser.add_argument("--batch_size", type=int, default=32, help="Test batch size")
-    parser.add_argument("--model_state_path", required=True, help="Path to the trained model")
+    parser.add_argument(
+        "--model_state_file", required=True, help="Path to the trained model file"
+    )
     parser.add_argument(
         "--tags", nargs="+", help="List of tags to find your results in Wandb"
     )
@@ -120,9 +110,13 @@ def main():
     device = get_device()
     input_transforms, model_klass = architecture.models[args.model]
     model = model_klass()
-    model.load_state_dict(torch.load(args.model_state_path))
+    model.load_state_dict(torch.load(args.model_state_file))
     _, test_loader = load_data(
-        args.data_path, transforms=input_transforms, download=args.download_data, batch_size=args.batch_size, first_n_rows=args.first_n_rows
+        args.data_path,
+        transforms=input_transforms,
+        download=args.download_data,
+        batch_size=args.batch_size,
+        first_n_rows=args.first_n_rows,
     )
 
     model.eval()

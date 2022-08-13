@@ -56,7 +56,13 @@ def vgg16_pretrained():
 models = {
     "jake_demo": ([transforms.ToTensor()], JakeDemoNet),
     "resnet_pretrained": (
-        [transforms.Resize(224), transforms.ToTensor()],
+        [
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.RandomRotation(20),
+            transforms.Resize(224),
+            transforms.ToTensor(),
+        ],
         resnet_pretrained,
     ),
     "vgg16_pretrained": (
