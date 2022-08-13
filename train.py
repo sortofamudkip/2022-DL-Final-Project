@@ -8,13 +8,24 @@ import torch.nn as nn
 import torch.optim as optim
 import wandb
 from torch.optim import lr_scheduler
-from utils import WANDB_PROJECT_NAME, get_device
+from utils import WANDB_PROJECT_NAME, get_device, DEFAULT_DATA_PATH, timestamp
+import logging
 
 # TODO: Validation?, take X % as validation
-# TODO: Checkpointing
+# Unet
+# Add weights to class imbalance, batch oversampling, make sure that at least 1 sample is in data loaders
 
 
-def train(model, criterion, optimizer, scheduler, train_loader, device, num_epochs=25):
+def train(
+    model,
+    criterion,
+    optimizer,
+    scheduler,
+    train_loader,
+    device,
+    num_epochs=25,
+    epoch_callback=(lambda epoch: epoch),
+):
     wandb.watch(model, log_freq=100)
 
     running_loss = 0.0
@@ -42,15 +53,15 @@ def train(model, criterion, optimizer, scheduler, train_loader, device, num_epoc
 
             scheduler.step()
 
+        epoch_callback(epoch)
+
 
 def main():
     parser = argparse.ArgumentParser(
         description="Train a model with given parameters and save its to some path"
     )
     parser.add_argument(
-        "--data_path",
-        default=os.path.join(os.path.dirname(os.path.realpath(__file__)), "data"),
-        help="Path to the stored raw data.",
+        "--data_path", default=DEFAULT_DATA_PATH, help="Path to the stored raw data",
     )
     parser.add_argument(
         "--download_data",
@@ -61,7 +72,12 @@ def main():
     parser.add_argument(
         "--batch_size", type=int, default=32, help="Training batch size"
     )
-    parser.add_argument("--num_epochs", type=int, default=25, help="Number of epochs")
+    parser.add_argument(
+        "--num_epochs",
+        type=int,
+        default=25,
+        help="Number of epochs. Exports one checkpointed model per epoch.",
+    )
     parser.add_argument(
         "--learning_rate", type=float, default=0.01, help="Learning rate"
     )
@@ -69,9 +85,9 @@ def main():
         "--tags", nargs="+", help="List of tags to find your results in Wandb"
     )
     parser.add_argument(
-        "--output_path",
-        help="Default path for the training model including a name such as data/fancy_model.pt",
-        required=True
+        "--model_state_path",
+        help="Default path where the final model and checkpoints are saved to",
+        default=DEFAULT_DATA_PATH,
     )
     parser.add_argument(
         "--model",
@@ -95,22 +111,36 @@ def main():
     # Setup all the things required for training
     criterion = nn.CrossEntropyLoss()
     device = get_device()
+
     # Lazily setup the model
     input_transforms, model_klass = architecture.models[args.model]
     model = model_klass()
+
     # Load the training data and apply image transformation and the badge size
     train_loader, _ = load_data(
         args.data_path,
         transforms=input_transforms,
         download=args.download_data,
         batch_size=args.batch_size,
-        first_n_rows=args.first_n_rows
+        first_n_rows=args.first_n_rows,
     )
-    # print("number of rows:", len(train_loader), args.first_n_rows); return
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
-    print(f"training model {args.model}...")
+    logging.info("Start training model", model=args.model)
+
+    def epoch_callback(epoch):
+        model_state_file = os.path.join(
+            args.model_state_path, "{}-{}-epoch-{}.pt".format(timestamp(), args.model, epoch)
+        )
+        logging.info(
+            "Saving checkpoint model at epoch",
+            model=args.model,
+            epoch=epoch,
+            model_state_file=model_state_file,
+        )
+
+        torch.save(model.state_dict(), model_state_file)
 
     train(
         model=model,
@@ -119,11 +149,17 @@ def main():
         train_loader=train_loader,
         scheduler=scheduler,
         device=device,
-        num_epochs=5
+        num_epochs=5,
+        epoch_callback=epoch_callback,
     )
-    print(f"saving model {args.model} to {args.output_path}...")
 
-    torch.save(model, args.output_path)
+    model_state_file = os.path.join(
+        args.model_state_path, "{}-{}-final.pt".format(timestamp(), args.model)
+    )
+    logging.info(
+        "Saving final model", model=args.model, model_state_file=model_state_file
+    )
+    torch.save(model.state_dict(), model_state_file)
 
 
 if __name__ == "__main__":

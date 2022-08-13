@@ -8,13 +8,22 @@ from PIL import Image
 from yaml import load
 import torchvision.transforms as tv_transforms
 
+# TODO: Kaggle submissoion
+
 
 class HistopathologicCancerDetectionDataset(Dataset):
     KAGGLE_DATASET = "histopathologic-cancer-detection"
 
     RELEVANT_FILES = ["train/", "train_labels.csv"]
 
-    def __init__(self, data_path, download=False, download_path="/tmp", transforms=[], first_n_rows=0):
+    def __init__(
+        self,
+        data_path,
+        download=False,
+        download_path="/tmp",
+        transforms=[],
+        first_n_rows=0,
+    ):
         self.data_path = data_path
         self.download_path = download_path
         if download:
@@ -22,7 +31,9 @@ class HistopathologicCancerDetectionDataset(Dataset):
         self.train_labels = pd.read_csv(
             os.path.join(self.data_path, "train_labels.csv")
         )
-        if first_n_rows and first_n_rows > 0: # obtain only first N rows of dataset. Used for debugging.
+        if (
+            first_n_rows and first_n_rows > 0
+        ):  # obtain only first N rows of dataset. Used for debugging.
             self.train_labels = self.train_labels.head(first_n_rows)
         self.transforms = tv_transforms.Compose(transforms)
 
@@ -50,7 +61,12 @@ class HistopathologicCancerDetectionDataset(Dataset):
 
 
 def load_data(
-    data_path=None, download=False, transforms=[], test_split=0.33, batch_size=32, first_n_rows=0
+    data_path=None,
+    download=False,
+    transforms=[],
+    test_split=0.33,
+    batch_size=32,
+    first_n_rows=0,
 ):
     """
     Downloads the dataset from Kaggle if needed, creates a Pytorch Dataset and then
@@ -71,7 +87,7 @@ def load_data(
     train_size = len(dataset) - test_size
     train_set, test_set = random_split(dataset, [train_size, test_size])
     train_loader = DataLoader(
-        train_set, shuffle=True, batch_size=batch_size, num_workers=4
+        train_set, shuffle=True, batch_size=batch_size, num_workers=1
     )
     test_loader = DataLoader(test_set, batch_size=batch_size, num_workers=4)
     return train_loader, test_loader
