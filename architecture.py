@@ -53,16 +53,24 @@ def vgg16_pretrained():
 # A model consists of image transformation suitable to the model + the actual model itself
 # Returning the type and not the instance makes parameterization a bit easier.
 # From the outside you can then call: models['resnet_pretrained']()
-models = {
+models_dict = {
     "jake_demo": ([transforms.ToTensor()], JakeDemoNet),
     "resnet_pretrained": (
-        [
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-            transforms.RandomRotation(20),
-            transforms.Resize(224),
-            transforms.ToTensor(),
-        ],
+        transforms.Compose([transforms.Resize(224),
+        *([transforms.RandomApply([
+        transforms.ColorJitter(brightness=0.5),
+        transforms.ColorJitter(contrast=0.5), 
+        transforms.ColorJitter(saturation=0.5),
+        transforms.ColorJitter(hue=0.5),],0.5)]),
+    *([transforms.RandomApply([
+        transforms.RandomRotation((0,0)),
+        transforms.RandomHorizontalFlip(p=1),
+        transforms.RandomVerticalFlip(p=1),
+        transforms.RandomRotation((90,90)),
+        transforms.RandomRotation((180,180)),
+        transforms.RandomRotation((270,270)),
+        
+    ],0.5)]),
         resnet_pretrained,
     ),
     "vgg16_pretrained": (
