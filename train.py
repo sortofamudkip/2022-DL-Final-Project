@@ -148,7 +148,7 @@ def main():
         criterion=criterion,
         optimizer=optimizer,
         train_loader=train_loader,
-        scheduler=scheduler,
+        #scheduler=scheduler,
         device=device,
         num_epochs=5,
         epoch_callback=epoch_callback,
