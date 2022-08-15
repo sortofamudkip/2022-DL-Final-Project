@@ -20,17 +20,18 @@ class HistopathologicCancerDetectionDataset(Dataset):
         self,
         data_path,
         download=False,
-        download_path="/tmp",
         transforms=[],
         first_n_rows=0,
     ):
-        self.data_path = data_path
-        self.download_path = download_path
         if download:
             self._download()
-        self.train_labels = pd.read_csv(
-            os.path.join(self.data_path, "train_labels.csv")
+        self.zip_file = zipfile.ZipFile(
+            os.path.join(data_path, self.KAGGLE_DATASET + ".zip")
         )
+        self.train_labels = pd.read_csv(
+            self.zip_file.open("train_labels.csv")
+        )
+        
         if (
             first_n_rows and first_n_rows > 0
         ):  # obtain only first N rows of dataset. Used for debugging.
@@ -43,22 +44,17 @@ class HistopathologicCancerDetectionDataset(Dataset):
     def __getitem__(self, index):
         image_id = self.train_labels["id"].iloc[index]
         label = self.train_labels["label"].iloc[index]
-        img = Image.open(os.path.join(self.data_path, "train", image_id + ".tif"))
+        image_file = self.zip_file.open(os.path.join("train", image_id + ".tif"))
+        img = Image.open(image_file)
         return self.transforms(img), label
+
 
     def _download(self):
         kaggle.api.authenticate()
         kaggle.api.competition_download_files(
-            self.KAGGLE_DATASET, path=self.download_path, quiet=False
+            self.KAGGLE_DATASET, path=self.data_path, quiet=False
         )
-        with zipfile.ZipFile(
-            os.path.join(self.download_path, self.KAGGLE_DATASET + ".zip")
-        ) as zipped:
-            for member in filter(
-                lambda name: name.startswith(self.RELEVANT_FILES), zipped.namelist()
-            ):
-                zipped.extract(member, self.data_path)
-
+        
 
 def load_data(
     data_path=None,
