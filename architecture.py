@@ -55,13 +55,14 @@ def vgg16_pretrained():
 # From the outside you can then call: models['resnet_pretrained']()
 models_dict = {
     "jake_demo": ([transforms.ToTensor()], JakeDemoNet),
-    "resnet_pretrained": (
-        transforms.Compose([transforms.Resize(224),
-        *([transforms.RandomApply([
+    "resnet_pretrained": 
+        ([transforms.Resize(224),
+          *([transforms.RandomApply([
         transforms.ColorJitter(brightness=0.5),
         transforms.ColorJitter(contrast=0.5), 
         transforms.ColorJitter(saturation=0.5),
-        transforms.ColorJitter(hue=0.5),],0.5)]),
+        transforms.ColorJitter(hue=0.5),
+  ],0.5)]),
     *([transforms.RandomApply([
         transforms.RandomRotation((0,0)),
         transforms.RandomHorizontalFlip(p=1),
@@ -70,9 +71,11 @@ models_dict = {
         transforms.RandomRotation((180,180)),
         transforms.RandomRotation((270,270)),
         
-    ],0.5)]),
+      ],0.5)]),
+                                              transforms.ToTensor()],
+                                             
         resnet_pretrained,
-    ),
+        ),
     "vgg16_pretrained": (
         [transforms.Resize(224), transforms.ToTensor()],
         vgg16_pretrained,
