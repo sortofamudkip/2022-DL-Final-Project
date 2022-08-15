@@ -45,13 +45,13 @@ def train(
                 optimizer.step()
 
             running_loss += loss.item() * input_images.size(0)
-            epoch_loss = running_loss / len(train_loader)
+        epoch_loss = running_loss / len(train_loader)
 
-            wandb.log(
+        wandb.log(
                 {"train_loss": running_loss, "epoch": epoch, "epoch_loss": epoch_loss}
             )
 
-            scheduler.step()
+        scheduler.step()
 
         epoch_callback(epoch)
 
