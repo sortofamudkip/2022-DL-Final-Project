@@ -17,21 +17,15 @@ class HistopathologicCancerDetectionDataset(Dataset):
     RELEVANT_FILES = ["train/", "train_labels.csv"]
 
     def __init__(
-        self,
-        data_path,
-        download=False,
-        transforms=[],
-        first_n_rows=0,
+        self, data_path, download=False, transforms=[], first_n_rows=0,
     ):
         if download:
             self._download()
         self.zip_file = zipfile.ZipFile(
             os.path.join(data_path, self.KAGGLE_DATASET + ".zip")
         )
-        self.train_labels = pd.read_csv(
-            self.zip_file.open("train_labels.csv")
-        )
-        
+        self.train_labels = pd.read_csv(self.zip_file.open("train_labels.csv"))
+
         if (
             first_n_rows and first_n_rows > 0
         ):  # obtain only first N rows of dataset. Used for debugging.
@@ -48,13 +42,12 @@ class HistopathologicCancerDetectionDataset(Dataset):
         img = Image.open(image_file)
         return self.transforms(img), label
 
-
     def _download(self):
         kaggle.api.authenticate()
         kaggle.api.competition_download_files(
             self.KAGGLE_DATASET, path=self.data_path, quiet=False
         )
-        
+
 
 def load_data(
     data_path=None,

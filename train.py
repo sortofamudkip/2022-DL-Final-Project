@@ -131,7 +131,8 @@ def main():
 
     def epoch_callback(epoch):
         model_state_file = os.path.join(
-            args.model_state_path, "{}-{}-epoch-{}.pt".format(timestamp(), args.model, epoch)
+            args.model_state_path,
+            "{}-{}-epoch-{}.pt".format(timestamp(), args.model, epoch),
         )
         logging.info(
             "Saving checkpoint model at epoch",
