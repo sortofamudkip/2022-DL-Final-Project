@@ -91,7 +91,7 @@ def main():
     )
     parser.add_argument(
         "--model",
-        choices=architecture.models.keys(),
+        choices=architecture.models_dict.keys(),
         required=True,
         help="Architecture to train. Check architecture.py",
     )
@@ -113,7 +113,7 @@ def main():
     device = get_device()
 
     # Lazily setup the model
-    input_transforms, model_klass = architecture.models[args.model]
+    input_transforms, model_klass = architecture.models_dict[args.model]
     model = model_klass()
 
     # Load the training data and apply image transformation and the badge size
