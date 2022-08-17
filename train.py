@@ -33,8 +33,8 @@ def train(
 
     for epoch in range(num_epochs):
         for input_images, output_labels in train_loader:
-            input_images.to(device)
-            output_labels.type(torch.LongTensor).to(device)
+            input_images=input_images.to(device)
+            output_labels=output_labels.type(torch.LongTensor).to(device)
 
             optimizer.zero_grad()
 
@@ -101,6 +101,13 @@ def main():
         default=0,
         help="Only use the first N rows of the dataset (for debugging)",
     )
+    parser.add_argument(
+        "--resume_training",
+        default='No',
+        help="To determine if model should be trained from scratch or from a checkpoint",
+    )
+    
+
     args = parser.parse_args()
 
     # Setup Wandb with the arguments from ArgumentParser
@@ -115,7 +122,8 @@ def main():
     # Lazily setup the model
     input_transforms, model_klass = architecture.models_dict[args.model]
     model = model_klass()
-
+    if args.resume_training=='Yes':
+      model.load_state_dict(torch.load(args.model_state_file))
     # Load the training data and apply image transformation and the badge size
     train_loader, _ = load_data(
         args.data_path,
@@ -123,9 +131,10 @@ def main():
         download=args.download_data,
         batch_size=args.batch_size,
         first_n_rows=args.first_n_rows,
+        
     )
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-    #scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+    scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
     logging.info("Start training model", model=args.model)
 
@@ -142,13 +151,13 @@ def main():
         )
 
         torch.save(model.state_dict(), model_state_file)
-
+    model=model.to(device)
     train(
         model=model,
         criterion=criterion,
         optimizer=optimizer,
         train_loader=train_loader,
-        #scheduler=scheduler,
+        scheduler=scheduler,
         device=device,
         num_epochs=5,
         epoch_callback=epoch_callback,
