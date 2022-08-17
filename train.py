@@ -140,7 +140,7 @@ def main():
 
     def epoch_callback(epoch):
         model_state_file = os.path.join(
-            args.model_state_path,
+            args.model_state_file,
             "{}-{}-epoch-{}.pt".format(timestamp(), args.model, epoch),
         )
         logging.info(
@@ -164,7 +164,7 @@ def main():
     )
 
     model_state_file = os.path.join(
-        args.model_state_path, "{}-{}-final.pt".format(timestamp(), args.model)
+        args.model_state_file, "{}-{}-final.pt".format(timestamp(), args.model)
     )
     logging.info(
         "Saving final model", model=args.model, model_state_file=model_state_file
