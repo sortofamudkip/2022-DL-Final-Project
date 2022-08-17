@@ -85,7 +85,7 @@ def main():
         "--tags", nargs="+", help="List of tags to find your results in Wandb"
     )
     parser.add_argument(
-        "--model_state_path",
+        "--model_state_file",
         help="Default path where the final model and checkpoints are saved to",
         default=DEFAULT_DATA_PATH,
     )
