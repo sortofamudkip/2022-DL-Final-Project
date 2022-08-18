@@ -7,22 +7,22 @@ import os
 from PIL import Image
 from yaml import load
 import torchvision.transforms as tv_transforms
+from utils import KAGGLE_DATASET
 
-# TODO: Kaggle submissoion
+
+def download_dataset(data_path):
+    kaggle.api.authenticate()
+    kaggle.api.competition_download_files(KAGGLE_DATASET, path=data_path, quiet=False)
 
 
 class HistopathologicCancerDetectionDataset(Dataset):
-    KAGGLE_DATASET = "histopathologic-cancer-detection"
-
-    RELEVANT_FILES = ["train/", "train_labels.csv"]
-
     def __init__(
         self, data_path, download=False, transforms=[], first_n_rows=0,
     ):
         if download:
-            self._download()
+            download_dataset(data_path)
         self.zip_file = zipfile.ZipFile(
-            os.path.join(data_path, self.KAGGLE_DATASET + ".zip")
+            os.path.join(data_path, KAGGLE_DATASET + ".zip")
         )
         self.train_labels = pd.read_csv(self.zip_file.open("train_labels.csv"))
 
@@ -42,31 +42,30 @@ class HistopathologicCancerDetectionDataset(Dataset):
         img = Image.open(image_file)
         return self.transforms(img), label
 
-    def _download(self):
-        kaggle.api.authenticate()
-        kaggle.api.competition_download_files(
-            self.KAGGLE_DATASET, path=self.data_path, quiet=False
-        )
 
-class HistopathologicCancerDetectionDataset_test(Dataset):
-    KAGGLE_DATASET = "histopathologic-cancer-detection"
-
-    def __init__(self, data_path,figsize=224):
+class HistopathologicCancerDetectionSubmissionDataset(Dataset):
+    def __init__(self, data_path, download=False, figsize=224):
+        if download:
+            download_dataset(data_path)
         self.data_path = data_path
-        self.test_id = pd.read_csv(self.zip_file.open("sample_submission.csv")) 
-        
-        self.transforms = tv_transforms.Compose([tv_transforms.Resize(figsize),
-                                              tv_transforms.ToTensor()],
-                                             )
+        self.zip_file = zipfile.ZipFile(
+            os.path.join(data_path, KAGGLE_DATASET + ".zip")
+        )
+        self.ids = pd.read_csv(self.zip_file.open("sample_submission.csv")).iloc[:, 0]
+        self.transforms = tv_transforms.Compose(
+            [tv_transforms.Resize(figsize), tv_transforms.ToTensor()],
+        )
 
     def __len__(self):
         return len(self.test_id)
 
     def __getitem__(self, index):
-        image_id = self.test_id["id"].iloc[index]
-        image_file=self.zip_file.open(os.path.join("test", image_id + ".tif"))
+        image_id = self.ids.iloc[index]
+        image_file = self.zip_file.open(os.path.join("test", image_id + ".tif"))
         img = Image.open(image_file)
         return self.transforms(img), image_id
+
+
 def load_data(
     data_path=None,
     download=False,
@@ -99,22 +98,18 @@ def load_data(
     test_loader = DataLoader(test_set, batch_size=batch_size, num_workers=2)
     return train_loader, test_loader
 
-def load_data_test(
-    data_path=None,
-    download=False,
-    transforms=[],
-    batch_size=64,
-    first_n_rows=0,
+
+def load_submission_data(
+    data_path=None, download=False, transforms=[], batch_size=64,
 ):
     """
     Creates data_loader for test dataset
     """
     if not data_path:
         data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test")
-    dataset = HistopathologicCancerDetectionDataset_test(
-        data_path,transforms=transforms
+    dataset = HistopathologicCancerDetectionSubmissionDataset(
+        data_path, download=download, transforms=transforms
     )
-    
-    test_loader = DataLoader(dataset, batch_size=batch_size, num_workers=2)
-    return test_loader
 
+    submission_loader = DataLoader(dataset, batch_size=batch_size, num_workers=2)
+    return submission_loader
