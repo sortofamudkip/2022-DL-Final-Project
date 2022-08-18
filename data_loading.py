@@ -106,7 +106,7 @@ def load_submission_data(
     Creates data_loader for test dataset
     """
     if not data_path:
-        data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test")
+        data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
     dataset = HistopathologicCancerDetectionSubmissionDataset(
         data_path, download=download, transforms=transforms
     )
