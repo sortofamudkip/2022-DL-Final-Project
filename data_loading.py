@@ -57,7 +57,7 @@ class HistopathologicCancerDetectionSubmissionDataset(Dataset):
         )
 
     def __len__(self):
-        return len(self.test_id)
+        return len(self.ids)
 
     def __getitem__(self, index):
         image_id = self.ids.iloc[index]
@@ -100,7 +100,7 @@ def load_data(
 
 
 def load_submission_data(
-    data_path=None, download=False, transforms=[], batch_size=64,
+    data_path=None, download=False, batch_size=1,
 ):
     """
     Creates data_loader for test dataset
@@ -108,8 +108,8 @@ def load_submission_data(
     if not data_path:
         data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
     dataset = HistopathologicCancerDetectionSubmissionDataset(
-        data_path, download=download, transforms=transforms
+        data_path, download=download
     )
 
-    submission_loader = DataLoader(dataset, batch_size=batch_size, num_workers=2)
+    submission_loader = DataLoader(dataset, batch_size=batch_size)
     return submission_loader
