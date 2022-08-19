@@ -2,7 +2,7 @@ import argparse
 from cProfile import label
 from pickletools import optimize
 import architecture
-from data_loading import load_data, load_data_test
+from data_loading import load_data, load_submission_data
 import os
 import torch
 import torch.nn as nn
@@ -74,8 +74,8 @@ def test(
 
 
 def submit_to_kaggle(model, test_loader, device, model_state_file):
-    ids = np.array()
-    labels = np.array()
+    ids = np.array([])
+    labels = np.array([])
 
     with torch.no_grad():
         for _, (input_images, output_ids) in enumerate(test_loader):
@@ -85,11 +85,11 @@ def submit_to_kaggle(model, test_loader, device, model_state_file):
             _, predicted = torch.max(predicted_outputs, 1)
 
             ids = np.append(ids, output_ids, axis=None)
-            labels = np.append(labels, predicted, axis=None)
+            labels = np.append(labels, predicted.cpu(), axis=None)
 
     df = pd.DataFrame(data={"id": ids, "label": labels})
     csv_file = os.path.join("/tmp", "{}-submission.csv".format(model_state_file))
-    df.to_csv(csv_file)
+    df.to_csv(csv_file,index=False)
     logging.info("Written submission file", file=csv_file)
 
     kaggle.api.authenticate()
@@ -143,7 +143,7 @@ def main():
     args = parser.parse_args()
 
     wandb.init(project=WANDB_PROJECT_NAME, tags=args.tags)
-    wandb.config.update({"phase": args.mode})
+    wandb.config.update({"phase":"Test"})
     wandb.config.update(args)
 
     device = get_device()
@@ -154,9 +154,9 @@ def main():
     model.eval()
 
     if args.submit_to_kaggle:
-        test_loader = load_data(args.data_path)
+        test_loader = load_submission_data(args.data_path)
         submit_to_kaggle(
-            model, test_loader, device=device,
+            model, test_loader, device=device,model_state_file=args.model_state_file
         )
     else:
         _, test_loader = load_data(
