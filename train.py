@@ -138,17 +138,14 @@ def main():
     logging.info("Start training model", model=args.model)
 
     def epoch_callback(epoch):
-        model_state_file = os.path.join(
-            args.model_state_file,
-            "{}-{}-epoch-{}.pt".format(timestamp(), args.model, epoch),
-        )
+        model_state_file = args.model_state_file+"{}-{}-epoch-{}.pt".format(timestamp(), args.model, epoch)
+        
         logging.info(
             "Saving checkpoint model at epoch",
             model=args.model,
             epoch=epoch,
             model_state_file=model_state_file,
         )
-
         torch.save(model.state_dict(), model_state_file)
 
     model = model.to(device)
@@ -163,9 +160,8 @@ def main():
         epoch_callback=epoch_callback,
     )
 
-    model_state_file = os.path.join(
-        args.model_state_file, "{}-{}-final.pt".format(timestamp(), args.model)
-    )
+    model_state_file = args.model_state_file+ "{}-{}-final.pt".format(timestamp(), args.model)
+    
     logging.info(
         "Saving final model", model=args.model, model_state_file=model_state_file
     )
