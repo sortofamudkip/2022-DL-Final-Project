@@ -83,9 +83,10 @@ def submit_to_kaggle(model, test_loader, device, model_state_file):
 
             predicted_outputs = model(input_images)
             _, predicted = torch.max(predicted_outputs, 1)
-
+            prob = torch.sigmoid(predicted_outputs)[:,1]
             ids = np.append(ids, output_ids, axis=None)
-            labels = np.append(labels, predicted.cpu(), axis=None)
+            labels = np.append(labels, prob.cpu(), axis=None)
+            
 
     df = pd.DataFrame(data={"id": ids, "label": labels})
     csv_file = os.path.join("/tmp", "{}-submission.csv".format(model_state_file))
