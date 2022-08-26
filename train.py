@@ -51,7 +51,7 @@ def train(
             {"train_loss": running_loss, "epoch": epoch, "epoch_loss": epoch_loss}
         )
 
-        # scheduler.step()
+        scheduler.step()
 
         epoch_callback(epoch)
 
@@ -132,7 +132,7 @@ def main():
         batch_size=args.batch_size,
         first_n_rows=args.first_n_rows,
     )
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
+    optimizer = optim.SGD(model.parameters(), lr=args.learning_rate)
     scheduler = lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
 
     logging.info("Start training model", model=args.model)
