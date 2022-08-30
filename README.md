@@ -46,7 +46,7 @@ After downloading the data, the `./train.py` file can then be used to train a mo
 * Train VGG-16 for 5 epochs (**VGG5**): ` python train.py --data_path="data" --num_epochs=5 --model=vgg16_pretrained --model_state_file="model_vgg.pt"` 
 
 
-### Train models
+### Test models
 After the models are trained and saved, the `./test.py` file can then be used to test a model. 
 
 * Test demo model (not used in final report): `python test.py --data_path="data" --model=demo --model_state_file="DEMO_MODEL_NAME"` 
