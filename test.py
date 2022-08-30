@@ -1,14 +1,9 @@
 import argparse
-from cProfile import label
-from pickletools import optimize
 import architecture
-from data_loading import load_data  # , load_submission_data
+from data_loading import load_data, load_submission_data
 import os
 import torch
-import torch.nn as nn
-import torch.optim as optim
 import wandb
-from torch.optim import lr_scheduler
 from utils import WANDB_PROJECT_NAME, get_device, DEFAULT_DATA_PATH, timestamp
 import sklearn.metrics
 import numpy as np
