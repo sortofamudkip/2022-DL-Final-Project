@@ -109,14 +109,15 @@ The link to the dataset can be found [here](https://www.kaggle.com/competitions/
 ## Used Resources
 The resources used in this project are listed below.
 ### Data source
-* Kaggle
+* [Dataset from Kaggle](https://www.kaggle.com/c/histopathologic-cancer-detection)
 ### Code references
 * The DEMO network is taken mainly from [here](https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html).
-* (if you looked at code from somewhere, put it here)
+* [Transfer Learning using VGG16 in Pytorch | VGG16 Architecture](https://www.analyticsvidhya.com/blog/2021/06/transfer-learning-using-vgg16-in-pytorch/)
+* [PyTorch transfer learning tutorial](https://pytorch.org/tutorials/beginner/transfer_learning_tutorial.html)
 ### Python & computational packages
-* Pytorch
-* Torchvision
-* etc
+* [Pytorch](https://pytorch.org/) and [Torchvision](https://pytorch.org/vision/stable/index.html)
+* [Kaggle API in Python](https://github.com/Kaggle/kaggle-api)
+* Numerical and image processing packages: Numpy, Pandas, Matplotlib, PIL
 ### Computational environments
 * Google Colab
 * etc
