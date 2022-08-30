@@ -1,5 +1,6 @@
 from more_itertools import unzip
 from torch.utils.data import DataLoader, Dataset, random_split
+from torch import Generator
 import kaggle
 import zipfile
 import pandas as pd
@@ -7,30 +8,29 @@ import os
 from PIL import Image
 from yaml import load
 import torchvision.transforms as tv_transforms
+from utils import KAGGLE_DATASET
 
-# TODO: Kaggle submissoion
+
+def download_dataset(data_path):
+    kaggle.api.authenticate()
+    kaggle.api.competition_download_files(KAGGLE_DATASET, path=data_path, quiet=False)
 
 
 class HistopathologicCancerDetectionDataset(Dataset):
-    KAGGLE_DATASET = "histopathologic-cancer-detection"
-
-    RELEVANT_FILES = ["train/", "train_labels.csv"]
-
     def __init__(
         self,
         data_path,
         download=False,
-        download_path="/tmp",
         transforms=[],
         first_n_rows=0,
     ):
-        self.data_path = data_path
-        self.download_path = download_path
         if download:
-            self._download()
-        self.train_labels = pd.read_csv(
-            os.path.join(self.data_path, "train_labels.csv")
+            download_dataset(data_path)
+        self.zip_file = zipfile.ZipFile(
+            os.path.join(data_path, KAGGLE_DATASET + ".zip")
         )
+        self.train_labels = pd.read_csv(self.zip_file.open("train_labels.csv"))
+
         if (
             first_n_rows and first_n_rows > 0
         ):  # obtain only first N rows of dataset. Used for debugging.
@@ -43,21 +43,32 @@ class HistopathologicCancerDetectionDataset(Dataset):
     def __getitem__(self, index):
         image_id = self.train_labels["id"].iloc[index]
         label = self.train_labels["label"].iloc[index]
-        img = Image.open(os.path.join(self.data_path, "train", image_id + ".tif"))
+        image_file = self.zip_file.open(os.path.join("train", image_id + ".tif"))
+        img = Image.open(image_file)
         return self.transforms(img), label
 
-    def _download(self):
-        kaggle.api.authenticate()
-        kaggle.api.competition_download_files(
-            self.KAGGLE_DATASET, path=self.download_path, quiet=False
+
+class HistopathologicCancerDetectionSubmissionDataset(Dataset):
+    def __init__(self, data_path, download=False, figsize=224):
+        if download:
+            download_dataset(data_path)
+        self.data_path = data_path
+        self.zip_file = zipfile.ZipFile(
+            os.path.join(data_path, KAGGLE_DATASET + ".zip")
         )
-        with zipfile.ZipFile(
-            os.path.join(self.download_path, self.KAGGLE_DATASET + ".zip")
-        ) as zipped:
-            for member in filter(
-                lambda name: name.startswith(self.RELEVANT_FILES), zipped.namelist()
-            ):
-                zipped.extract(member, self.data_path)
+        self.ids = pd.read_csv(self.zip_file.open("sample_submission.csv")).iloc[:, 0]
+        self.transforms = tv_transforms.Compose(
+            [tv_transforms.Resize(figsize), tv_transforms.ToTensor()],
+        )
+
+    def __len__(self):
+        return len(self.ids)
+
+    def __getitem__(self, index):
+        image_id = self.ids.iloc[index]
+        image_file = self.zip_file.open(os.path.join("test", image_id + ".tif"))
+        img = Image.open(image_file)
+        return self.transforms(img), image_id
 
 
 def load_data(
@@ -85,9 +96,32 @@ def load_data(
     )
     test_size = int(len(dataset) * test_split)
     train_size = len(dataset) - test_size
-    train_set, test_set = random_split(dataset, [train_size, test_size])
-    train_loader = DataLoader(
-        train_set, shuffle=True, batch_size=batch_size, num_workers=1
+    train_set, test_set = random_split(
+        dataset, [train_size, test_size], generator=Generator().manual_seed(42)
     )
-    test_loader = DataLoader(test_set, batch_size=batch_size, num_workers=4)
+    train_loader = DataLoader(train_set, shuffle=True, batch_size=batch_size)
+    test_loader = DataLoader(test_set, batch_size=batch_size)
     return train_loader, test_loader
+
+
+def load_submission_data(
+    data_path=None,
+    download=False,
+    batch_size=1,
+):
+    """
+    Creates data_loader for test dataset
+    """
+    if not data_path:
+
+        data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
+    dataset = HistopathologicCancerDetectionSubmissionDataset(
+        data_path, download=download
+    )
+
+    submission_loader = DataLoader(dataset, batch_size=batch_size)
+    return submission_loader
+
+
+if __name__ == "__main__":
+    download_dataset("./data/")

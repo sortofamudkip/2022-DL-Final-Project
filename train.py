@@ -11,6 +11,7 @@ from torch.optim import lr_scheduler
 from utils import WANDB_PROJECT_NAME, get_device, DEFAULT_DATA_PATH, timestamp
 import logging
 
+
 def train(
     model,
     criterion,
@@ -56,7 +57,9 @@ def main():
         description="Train a model with given parameters and save its to some path"
     )
     parser.add_argument(
-        "--data_path", default=DEFAULT_DATA_PATH, help="Path to the stored raw data",
+        "--data_path",
+        default=DEFAULT_DATA_PATH,
+        help="Path to the stored raw data",
     )
     parser.add_argument(
         "--download_data",
@@ -133,8 +136,10 @@ def main():
     logging.info("Start training model", model=args.model)
 
     def epoch_callback(epoch):
-        model_state_file = args.model_state_file+"{}-{}-epoch-{}.pt".format(timestamp(), args.model, epoch)
-        
+        model_state_file = args.model_state_file + "{}-{}-epoch-{}.pt".format(
+            timestamp(), args.model, epoch
+        )
+
         logging.info(
             "Saving checkpoint model at epoch",
             model=args.model,
@@ -155,8 +160,10 @@ def main():
         epoch_callback=epoch_callback,
     )
 
-    model_state_file = args.model_state_file+ "{}-{}-final.pt".format(timestamp(), args.model)
-    
+    model_state_file = args.model_state_file + "{}-{}-final.pt".format(
+        timestamp(), args.model
+    )
+
     logging.info(
         "Saving final model", model=args.model, model_state_file=model_state_file
     )

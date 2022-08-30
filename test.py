@@ -2,7 +2,7 @@ import argparse
 from cProfile import label
 from pickletools import optimize
 import architecture
-from data_loading import load_data#, load_submission_data
+from data_loading import load_data  # , load_submission_data
 import os
 import torch
 import torch.nn as nn
@@ -26,7 +26,9 @@ import logging
 
 
 def test(
-    model, test_loader, device,
+    model,
+    test_loader,
+    device,
 ):
     wandb.watch(model, log_freq=100)
 
@@ -63,11 +65,14 @@ def test(
     wandb.run.summary["recall"] = recall
     wandb.run.summary["precision"] = precision
     wandb.run.summary["auc"] = auc
-    wandb.sklearn.plot_roc(y_true, y_predicated, [0, 1])
+    # wandb.sklearn.plot_roc(y_true, y_predicated, [0, 1])
     wandb.log(
         {
             "conf_matrix": wandb.plot.confusion_matrix(
-                probs=None, y_true=y_true, preds=y_predicated, class_names=[0, 1],
+                probs=None,
+                y_true=y_true,
+                preds=y_predicated,
+                class_names=[0, 1],
             )
         }
     )
@@ -83,14 +88,13 @@ def submit_to_kaggle(model, test_loader, device, model_state_file):
 
             predicted_outputs = model(input_images)
             _, predicted = torch.max(predicted_outputs, 1)
-            prob = torch.sigmoid(predicted_outputs)[:,1]
+            prob = torch.sigmoid(predicted_outputs)[:, 1]
             ids = np.append(ids, output_ids, axis=None)
             labels = np.append(labels, prob.cpu(), axis=None)
-            
 
     df = pd.DataFrame(data={"id": ids, "label": labels})
     csv_file = os.path.join("/tmp", "{}-submission.csv".format(model_state_file))
-    df.to_csv(csv_file,index=False)
+    df.to_csv(csv_file, index=False)
     logging.info("Written submission file", file=csv_file)
 
     kaggle.api.authenticate()
@@ -144,7 +148,7 @@ def main():
     args = parser.parse_args()
 
     wandb.init(project=WANDB_PROJECT_NAME, tags=args.tags)
-    wandb.config.update({"phase":"Test"})
+    wandb.config.update({"phase": "Test"})
     wandb.config.update(args)
 
     device = get_device()
@@ -157,7 +161,7 @@ def main():
     if args.submit_to_kaggle:
         test_loader = load_submission_data(args.data_path)
         submit_to_kaggle(
-            model, test_loader, device=device,model_state_file=args.model_state_file
+            model, test_loader, device=device, model_state_file=args.model_state_file
         )
     else:
         _, test_loader = load_data(
