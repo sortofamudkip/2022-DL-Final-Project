@@ -45,21 +45,51 @@ The 6.31GB data should then be downloaded to the folder `./data/`.
 ### Train models
 After downloading the data, the `./train.py` file can then be used to train a model. 
 
-* Train demo model (**DEMO**, not used in final report): `python train.py --data_path="data" --num_epochs=5 --model=demo --model_state_file="model_demo.pt"` 
-* Train ResNet-18 trained for 5 epochs (**RES5**): `python train.py --data_path="data" --num_epochs=5 --model=resnet --model_state_file="model_resnet.pt"` 
-* Train ResNet-18 with data augmentation for 5 epochs (**RESAUG5**): `python train.py --data_path="data" --num_epochs=5 --model=resnet_augmented --model_state_file="model_resnet_aug.pt"` 
-* Train RESAUG5 trained for 5 more epochs (**RESAUG10**): `python train.py --data_path="data" --num_epochs=5 --model=resnet_augmented --model_state_file="RES5_MODEL_NAME" --resume_training` 
-* Train VGG-16 for 5 epochs (**VGG5**): ` python train.py --data_path="data" --num_epochs=5 --model=vgg16_pretrained --model_state_file="model_vgg.pt"` 
+* Train demo model (**DEMO**, not used in final report): 
+
+`python train.py --data_path="data" --num_epochs=5 --model=demo --model_state_file="model_demo.pt"` 
+
+
+* Train ResNet-18 trained for 5 epochs (**RES5**): 
+
+`python train.py --data_path="data" --num_epochs=5 --model=resnet --model_state_file="model_resnet.pt"` 
+
+* Train ResNet-18 with data augmentation for 5 epochs (**RESAUG5**): 
+
+`python train.py --data_path="data" --num_epochs=5 --model=resnet_augmented --model_state_file="model_resnet_aug.pt"` 
+
+* Train RESAUG5 trained for 5 more epochs (**RESAUG10**): 
+
+`python train.py --data_path="data" --num_epochs=5 --model=resnet_augmented --model_state_file="RES5_MODEL_NAME" --resume_training` 
+
+* Train VGG-16 for 5 epochs (**VGG5**): 
+
+` python train.py --data_path="data" --num_epochs=5 --model=vgg16_pretrained --model_state_file="model_vgg.pt"` 
 
 
 ### Test models
 After the models are trained and saved, the `./test.py` file can then be used to test a model. 
 
-* Test demo model (not used in final report): `python test.py --data_path="data" --model=demo --model_state_file="DEMO_MODEL_NAME"` 
-* Test ResNet-18 trained for 5 epochs (**RES5**): `python test.py --data_path="data" --model=resnet --model_state_file="RES5_MODEL_NAME"` 
-* Test ResNet-18 with data augmentation, trained for 5 epochs (**RESAUG5**): `python test.py --data_path="data" --model=resnet_augmented --model_state_file="RESAUG5_MODEL_NAME"` 
-* Test RESAUG5 trained for 5 more epochs (**RESAUG10**): `python test.py --data_path="data" --model=resnet_augmented --model_state_file="RESAUG10_MODEL_NAME"` 
-* Test VGG-16 (**VGG5**): `python test.py --data_path="data" --model=vgg16_pretrained --model_state_file="VGG5_MODEL_NAME"` 
+* Test demo model (not used in final report): 
+
+`python test.py --data_path="data" --model=demo --model_state_file="DEMO_MODEL_NAME"` 
+
+* Test ResNet-18 trained for 5 epochs (**RES5**): 
+
+`python test.py --data_path="data" --model=resnet --model_state_file="RES5_MODEL_NAME"` 
+
+* Test ResNet-18 with data augmentation, trained for 5 epochs (**RESAUG5**): 
+
+`python test.py --data_path="data" --model=resnet_augmented --model_state_file="RESAUG5_MODEL_NAME"` 
+
+* Test RESAUG5 trained for 5 more epochs (**RESAUG10**): 
+
+`python test.py --data_path="data" --model=resnet_augmented --model_state_file="RESAUG10_MODEL_NAME"` 
+
+* Test VGG-16 (**VGG5**): 
+
+`python test.py --data_path="data" --model=vgg16_pretrained --model_state_file="VGG5_MODEL_NAME"` 
+
 
 ## Saved models
 The saved trained models can be found in the following links:
