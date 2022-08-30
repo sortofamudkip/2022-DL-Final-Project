@@ -13,12 +13,6 @@ import pandas as pd
 import kaggle
 import logging
 
-# TODO: divide by total
-# TODO: Use actual validation
-# TODO: Submit to kaggle
-# TODO: http://gradcam.cloudcv.org/
-# TODO: Posthoc Captum
-
 
 def test(
     model,

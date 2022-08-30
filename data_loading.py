@@ -1,4 +1,3 @@
-from more_itertools import unzip
 from torch.utils.data import DataLoader, Dataset, random_split
 from torch import Generator
 import kaggle
@@ -6,9 +5,9 @@ import zipfile
 import pandas as pd
 import os
 from PIL import Image
-from yaml import load
 import torchvision.transforms as tv_transforms
-from utils import KAGGLE_DATASET
+from utils import KAGGLE_DATASET, DEFAULT_DATA_PATH
+import argparse
 
 
 def download_dataset(data_path):
@@ -90,7 +89,7 @@ def load_data(
     3. Add Token file to ~/.kaggle/kaggle.json
     """
     if not data_path:
-        data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
+        data_path = DEFAULT_DATA_PATH
     dataset = HistopathologicCancerDetectionDataset(
         data_path, download=download, transforms=transforms, first_n_rows=first_n_rows
     )
@@ -113,8 +112,7 @@ def load_submission_data(
     Creates data_loader for test dataset
     """
     if not data_path:
-
-        data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
+        data_path = DEFAULT_DATA_PATH
     dataset = HistopathologicCancerDetectionSubmissionDataset(
         data_path, download=download
     )
@@ -123,5 +121,17 @@ def load_submission_data(
     return submission_loader
 
 
+def main():
+    parser = argparse.ArgumentParser(description="Download the dataset")
+    parser.add_argument(
+        "--data_path",
+        default=DEFAULT_DATA_PATH,
+        help="Path to the stored raw data. Downloads the data if it cannot be found.",
+    )
+
+    args = parser.parse_args()
+
+    download_dataset(args.data_path)
+
 if __name__ == "__main__":
-    download_dataset("./data/")
+    main()

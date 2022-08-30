@@ -8,7 +8,6 @@ Members:
 * Wishyut Pitawanik
 * Niklas Riekenbrauck
 
-
 ## Links
 * The Colab demo file can be found [here](https://colab.research.google.com/drive/1S5pJnkNnFQOg1wkDW5q-kJhHEHNOMR9C?usp=sharing).
 * The link to the Github repository can be found **THIS NEEDS TO BE ADDED**.
@@ -17,6 +16,8 @@ Members:
 Popular Python environments such as conda, virtualenv can be used. First, obtain the dependencies from `requirements.txt`:
 
 `pip install -r requirements.txt`
+
+We recommend the usage of Python3. Our scripts were tested on Linux and OS X.
 
 ### Setup Kaggle for data loading
 In order to download the dataset, Kaggle is requried. The following steps should be taken:
@@ -36,11 +37,13 @@ To run the code in this repository, a wandb account must be created, as describe
 **(explain the demo here)**
 
 ## Quickstart
-For this section, the root directory is the directory of the README (i.e., the top-level directory for this repo).
+For this section, the root directory is the directory of the README (i.e., the top-level directory for this repo). 
 
 ### Download data
-To download the dataset, ensure you have the correct Kaggle API credentials and then run `python ./data_loading.py`. 
+To download the dataset, ensure you have the correct Kaggle API credentials and then run `python data_loading.py`. 
 The 6.31GB data should then be downloaded to the folder `./data/`.
+
+> **Tip:** Use `python data_loading.py -h` to see more options
 
 ### Train models
 After downloading the data, the `./train.py` file can then be used to train a model. 
@@ -66,6 +69,7 @@ After downloading the data, the `./train.py` file can then be used to train a mo
 
 ` python train.py --data_path="data" --num_epochs=5 --model=vgg16_pretrained --model_state_file="model_vgg.pt"` 
 
+> **Tip:** Use `python train.py -h` to see more options
 
 ### Test models
 After the models are trained and saved, the `./test.py` file can then be used to test a model. 
@@ -90,6 +94,7 @@ After the models are trained and saved, the `./test.py` file can then be used to
 
 `python test.py --data_path="data" --model=vgg16_pretrained --model_state_file="VGG5_MODEL_NAME"` 
 
+> **Tip:** Use `python test.py -h` to see more options
 
 ## Saved models
 The saved trained models can be found in the following links:
@@ -100,6 +105,3 @@ The saved trained models can be found in the following links:
 
 ## Dataset link
 The link to the dataset can be found [here](https://www.kaggle.com/competitions/histopathologic-cancer-detection/data).
-
-## Resources used
-* I don't know what this refers to

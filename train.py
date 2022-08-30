@@ -1,8 +1,6 @@
 import argparse
-from pickletools import optimize
 import architecture
 from data_loading import load_data
-import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
