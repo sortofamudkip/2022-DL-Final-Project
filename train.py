@@ -11,11 +11,6 @@ from torch.optim import lr_scheduler
 from utils import WANDB_PROJECT_NAME, get_device, DEFAULT_DATA_PATH, timestamp
 import logging
 
-# TODO: Validation?, take X % as validation
-# Unet
-# Add weights to class imbalance, batch oversampling, make sure that at least 1 sample is in data loaders
-
-
 def train(
     model,
     criterion,

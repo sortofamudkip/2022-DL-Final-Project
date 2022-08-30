@@ -2,7 +2,7 @@ import argparse
 from cProfile import label
 from pickletools import optimize
 import architecture
-from data_loading import load_data, load_submission_data
+from data_loading import load_data#, load_submission_data
 import os
 import torch
 import torch.nn as nn

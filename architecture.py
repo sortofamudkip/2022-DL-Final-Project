@@ -6,9 +6,9 @@ from torchvision import datasets, models, transforms
 import torchvision.transforms as transforms
 
 
-class JakeDemoNet(nn.Module):
+class DemoNet(nn.Module):
     def __init__(self):
-        super(JakeDemoNet, self).__init__()
+        super(DemoNet, self).__init__()
         # 1 input image channel, 6 output channels, 5x5 square convolution
         # kernel
         self.conv1 = nn.Conv2d(3, 6, 5)
@@ -54,8 +54,9 @@ def vgg16_pretrained():
 # Returning the type and not the instance makes parameterization a bit easier.
 # From the outside you can then call: models['resnet_pretrained']()
 models_dict = {
-    "jake_demo": ([transforms.ToTensor()], JakeDemoNet),
-    "resnet_pretrained": (
+    "demo": ([transforms.ToTensor()], DemoNet),
+    "resnet": ([transforms.Resize(224), transforms.ToTensor()], resnet_pretrained),
+    "resnet_augmented": (
         [
             transforms.Resize(224),
             *(

@@ -157,6 +157,9 @@ wandb
 # local storage (dataset etc)
 data
 jake/*
+saved_models
+model_*.pt
+model_*.pth
 
 # Kaggle files, such as API key
 .kaggle/*
