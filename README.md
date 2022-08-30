@@ -1,32 +1,38 @@
 # 2022-DL-Final-Project
-Also obviously this is a private repo, the submitted files will just the final version of this repo.
+The file contains an outline of the project as well as its contents.
+
+Members:
+* Jonathan Cedeno
+* Elena Golimblevskaia
+* Youssef Mecky
+* Wishyut Pitawanik
+* Niklas Riekenbrauck
+
 
 ## Links
 * The Colab demo file can be found [here](https://colab.research.google.com/drive/1S5pJnkNnFQOg1wkDW5q-kJhHEHNOMR9C?usp=sharing).
 * The link to the Github repository can be found **THIS NEEDS TO BE ADDED**.
 
 ### Python Setup
-You can setup your desired python env using conda, virtualenv etc. Make sure to get all the dependencies from `requirements.txt`:
+Popular Python environments such as conda, virtualenv can be used. First, obtain the dependencies from `requirements.txt`:
 
 `pip install -r requirements.txt`
 
 ### Setup Kaggle for data loading
-In order to download the dataset, you need access to Kaggle. Please follow these steps:
+In order to download the dataset, Kaggle is requried. The following steps should be taken:
 1. Create account on [Kaggle](https://www.kaggle.com/)
 2. Go to `https://www.kaggle.com/<ACCOUNT_NAME>/account`
 2. Click "Create New API Token", which downloads a token file
-4. Move downloaded token file to ~/.kaggle/kaggle.json`
+4. Move the downloaded token file to `~/.kaggle/kaggle.json`
 
-If you now call the function `load_data` in `data_loading.py`, the dataset will be downloaded into the `data/` folder in this repo. When training or testing for the first time, you can download the data.
+Calling `./data_loading.py` will cause the the dataset will be downloaded into the `data/` folder in this repository. When training or testing for the first time, the data will also be downloaded, if it hasn't been already.
 
 ### Setup Wandb
-For the training phase, we recommend logging to wandb. For this, please create an account as described [here](https://docs.wandb.ai/quickstart). When training a model, please specify tags in the CLI args in order to help us organize the results.
+Weights and Biases (wandb) is throughout the training and testing process to store model performance metrics.
 
-## Using this tool
-### Train a model
-Use the `train.py`. Run `python train.py -h` to see the required arguments.
+To run the code in this repository, a wandb account must be created, as described [here](https://docs.wandb.ai/quickstart). When training or testing a model, it is recommended to add relevant tags in the CLI arguments in order to organize the results.
 
-### Colab Demo
+## Colab Demo
 **(explain the demo here)**
 
 ## Quickstart
