@@ -48,24 +48,24 @@ The 6.31GB data should then be downloaded to the folder `./data/`.
 ### Train models
 After downloading the data, the `./train.py` file can then be used to train a model. 
 
-* Train demo model (**DEMO**, not used in final report): 
+* Train demo model (**DEMO**, not used in final report), producing a file represented as `DEMO_MODEL_NAME`: 
 
 `python train.py --data_path="data" --num_epochs=5 --model=demo --model_state_file="model_demo.pt"` 
 
 
-* Train ResNet-18 trained for 5 epochs (**RES5**): 
+* Train ResNet-18 trained for 5 epochs (**RES5**), producing a file represented as `RES5_MODEL_NAME`: 
 
 `python train.py --data_path="data" --num_epochs=5 --model=resnet --model_state_file="model_resnet.pt"` 
 
-* Train ResNet-18 with data augmentation for 5 epochs (**RESAUG5**): 
+* Train ResNet-18 with data augmentation for 5 epochs (**RESAUG5**), producing a file represented as `RESAUG5_MODEL_NAME`: 
 
 `python train.py --data_path="data" --num_epochs=5 --model=resnet_augmented --model_state_file="model_resnet_aug.pt"` 
 
-* Train RESAUG5 trained for 5 more epochs (**RESAUG10**): 
+* Train RESAUG5 trained for 5 more epochs (**RESAUG10**), producing a file represented as `RESAUG10_MODEL_NAME`: 
 
 `python train.py --data_path="data" --num_epochs=5 --model=resnet_augmented --model_state_file="RES5_MODEL_NAME" --resume_training` 
 
-* Train VGG-16 for 5 epochs (**VGG5**): 
+* Train VGG-16 for 5 epochs (**VGG5**), producing a file represented as `VGG5_MODEL_NAME`: 
 
 ` python train.py --data_path="data" --num_epochs=5 --model=vgg16_pretrained --model_state_file="model_vgg.pt"` 
 
@@ -105,3 +105,18 @@ The saved trained models can be found in the following links:
 
 ## Dataset link
 The link to the dataset can be found [here](https://www.kaggle.com/competitions/histopathologic-cancer-detection/data).
+
+## Used Resources
+The resources used in this project are listed below.
+### Data source
+* Kaggle
+### Code references
+* The DEMO network is taken mainly from [here](https://pytorch.org/tutorials/beginner/blitz/cifar10_tutorial.html).
+* (if you looked at code from somewhere, put it here)
+### Python & computational packages
+* Pytorch
+* Torchvision
+* etc
+### Computational environments
+* Google Colab
+* etc
