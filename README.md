@@ -39,6 +39,11 @@ In this demo we hoped to show a bit of the code used in the experiments and show
 ## Quickstart
 For this section, the root directory is the directory of the README (i.e., the top-level directory for this repo). 
 
+
+> Our main model should be RESAUG10 , check save models for reference 
+
+
+
 ### Download data
 To download the dataset, ensure you have the correct Kaggle API credentials and then run `python data_loading.py`. 
 The 6.31GB data should then be downloaded to the folder `./data/`.
@@ -46,7 +51,14 @@ The 6.31GB data should then be downloaded to the folder `./data/`.
 > **Tip:** Use `python data_loading.py -h` to see more options
 
 ### Train models
-After downloading the data, the `./train.py` file can then be used to train a model. 
+
+
+After downloading the data, the `./train.py` file can then be used to train a model.
+
+* Train RESAUG5 trained for 5 more epochs (**RESAUG10**), producing a file represented as `RESAUG10_MODEL_NAME`: 
+
+`python train.py --data_path="data" --num_epochs=5 --model=resnet_augmented --model_state_file="RES5_MODEL_NAME" --resume_training` 
+ 
 
 * Train demo model (**DEMO**, not used in final report), producing a file represented as `DEMO_MODEL_NAME`: 
 
@@ -61,9 +73,6 @@ After downloading the data, the `./train.py` file can then be used to train a mo
 
 `python train.py --data_path="data" --num_epochs=5 --model=resnet_augmented --model_state_file="model_resnet_aug.pt"` 
 
-* Train RESAUG5 trained for 5 more epochs (**RESAUG10**), producing a file represented as `RESAUG10_MODEL_NAME`: 
-
-`python train.py --data_path="data" --num_epochs=5 --model=resnet_augmented --model_state_file="RES5_MODEL_NAME" --resume_training` 
 
 * Train VGG-16 for 5 epochs (**VGG5**), producing a file represented as `VGG5_MODEL_NAME`: 
 
