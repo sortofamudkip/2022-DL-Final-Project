@@ -10,7 +10,7 @@ Members:
 
 ## Links
 * The Colab demo file can be found [here](https://colab.research.google.com/drive/1S5pJnkNnFQOg1wkDW5q-kJhHEHNOMR9C?usp=sharing).
-* The link to the Github repository can be found **THIS NEEDS TO BE ADDED**.
+* The link to the Github repository can be found [here](https://github.com/sortofamudkip/2022-DL-Final-Project).
 
 ### Python Setup
 Popular Python environments such as conda, virtualenv can be used. First, obtain the dependencies from `requirements.txt`:
@@ -34,7 +34,7 @@ Weights and Biases (wandb) is throughout the training and testing process to sto
 To run the code in this repository, a wandb account must be created, as described [here](https://docs.wandb.ai/quickstart). When training or testing a model, it is recommended to add relevant tags in the CLI arguments in order to organize the results.
 
 ## Colab Demo
-**(explain the demo here)**
+In this demo we hoped to show a bit of the code used in the experiments and show a proof of concept in some sense that is why we only used 512 images and show the main structutre of our training and evaulation however we can't draw any conclusions here due to the small size of the sample used
 
 ## Quickstart
 For this section, the root directory is the directory of the README (i.e., the top-level directory for this repo). 
@@ -120,4 +120,3 @@ The resources used in this project are listed below.
 * Numerical and image processing packages: Numpy, Pandas, Matplotlib, PIL
 ### Computational environments
 * Google Colab
-* etc
