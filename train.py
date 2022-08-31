@@ -22,10 +22,12 @@ def train(
 ):
     wandb.watch(model, log_freq=100)
 
-    running_loss = 0.0
+    
     model.train()
 
     for epoch in range(num_epochs):
+        
+        running_loss = 0.0
         for input_images, output_labels in train_loader:
             input_images = input_images.to(device)
             output_labels = output_labels.type(torch.LongTensor).to(device)
